@@ -36,12 +36,15 @@ def search_and_display():
     # Desabilita o botão enquanto a pesquisa é feita
     search_button.config(state=tk.DISABLED)
     results_text.delete(1.0, tk.END)  # Limpa a área de resultados
-    
+
+    # Exibe a mensagem de pesquisa
+    status_label.config(text="Estamos Pesquisando...")
+
     # Função interna para executar a pesquisa e atualizar a interface
     async def run_search():
         try:
             # Configura o modelo GPT4All
-            llm = GPT4All(model="C:/Users/Flaviano/AppData/Local/nomic.ai/GPT4All/Meta-Llama-3-8B-Instruct.Q4_0.gguf")
+            llm = GPT4All(model="MODELO")
             
             # Realiza a pesquisa
             search_results = await aget_results(query)
@@ -61,7 +64,8 @@ def search_and_display():
         finally:
             # Reabilita o botão após a pesquisa
             search_button.config(state=tk.NORMAL)
-    
+            status_label.config(text="")  # Limpa a mensagem de status
+
     # Executa a função de pesquisa assíncrona
     asyncio.run(run_search())
 
@@ -75,6 +79,10 @@ search_label = tk.Label(app, text="Digite o nome da empresa ou tópico para pesq
 search_label.pack(pady=5)
 search_entry = tk.Entry(app, width=50)
 search_entry.pack(pady=5)
+
+# Rótulo para mostrar o status da pesquisa
+status_label = tk.Label(app, text="")
+status_label.pack(pady=5)
 
 # Botão para realizar a pesquisa
 search_button = tk.Button(app, text="Pesquisar", command=search_and_display)
