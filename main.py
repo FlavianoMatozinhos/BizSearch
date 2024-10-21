@@ -55,11 +55,7 @@ def run_search(query):
 
 def update_results(search_results, summary):
     results_text.delete(1.0, tk.END)  # Limpa a área de resultados
-    results_text.insert(tk.END, "Resultados da pesquisa:\n")
-    for i, result in enumerate(search_results):
-        results_text.insert(tk.END, f"{i+1}. {result['title']} - {result['href']}\n")
-    
-    results_text.insert(tk.END, "\nResumo das informações coletadas:\n")
+    results_text.insert(tk.END, "Resumo das informações coletadas:\n")
     results_text.insert(tk.END, summary)
 
 def search_and_display():
