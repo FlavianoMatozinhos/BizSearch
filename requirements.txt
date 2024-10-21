@@ -1,0 +1,4 @@
+langchain
+gpt4all
+duckduckgo-search
+asyncio
