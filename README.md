@@ -54,7 +54,7 @@ Antes de instalar e rodar o projeto, certifique-se de ter os seguintes itens ins
 
 4. **Baixe o modelo GPT4All**
 
-   Coloque o arquivo de modelo `.gguf` do GPT4All no caminho especificado no código (por exemplo, `C:/Users/Flaviano/AppData/Local/nomic.ai/GPT4All/Meta-Llama-3-8B-Instruct.Q4_0.gguf`). Certifique-se de atualizar o caminho no código se ele estiver diferente.
+   Coloque o arquivo de modelo `.gguf` do GPT4All no caminho especificado no código (por exemplo, `C:/Users/Teste/AppData/Local/nomic.ai/GPT4All/Meta-Llama-3-8B-Instruct.Q4_0.gguf`). Certifique-se de atualizar o caminho no código se ele estiver diferente.
 
 ## Como Executar o Projeto
 1. **Execute o arquivo principal**
