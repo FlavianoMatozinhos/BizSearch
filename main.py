@@ -1,4 +1,5 @@
 import asyncio
+import threading
 import tkinter as tk
 from tkinter import scrolledtext, messagebox
 from duckduckgo_search import AsyncDDGS
@@ -32,6 +33,35 @@ def create_summary(llm, search_results):
     
     return summary
 
+def run_search(query):
+    try:
+        # Configura o modelo GPT4All usando o caminho do .env
+        model_path = os.getenv("GPT4ALL_MODEL_PATH")
+        llm = GPT4All(model=model_path)
+        
+        # Realiza a pesquisa
+        search_results = asyncio.run(aget_results(query))
+        
+        # Gera um resumo dos resultados encontrados
+        summary = create_summary(llm, search_results)
+
+        # Atualiza a área de texto com os resultados na thread principal
+        app.after(0, update_results, search_results, summary)
+    except Exception as e:
+        app.after(0, lambda: messagebox.showerror("Erro", f"Ocorreu um erro ao realizar a pesquisa: {e}"))
+    finally:
+        # Reabilita o botão após a pesquisa
+        app.after(0, lambda: search_button.config(state=tk.NORMAL))
+
+def update_results(search_results, summary):
+    results_text.delete(1.0, tk.END)  # Limpa a área de resultados
+    results_text.insert(tk.END, "Resultados da pesquisa:\n")
+    for i, result in enumerate(search_results):
+        results_text.insert(tk.END, f"{i+1}. {result['title']} - {result['href']}\n")
+    
+    results_text.insert(tk.END, "\nResumo das informações coletadas:\n")
+    results_text.insert(tk.END, summary)
+
 def search_and_display():
     query = search_entry.get()
     if not query:
@@ -40,36 +70,9 @@ def search_and_display():
     
     # Desabilita o botão enquanto a pesquisa é feita
     search_button.config(state=tk.DISABLED)
-    results_text.delete(1.0, tk.END)  # Limpa a área de resultados
     
-    # Função interna para executar a pesquisa e atualizar a interface
-    async def run_search():
-        try:
-            # Configura o modelo GPT4All usando o caminho do .env
-            model_path = os.getenv("GPT4ALL_MODEL_PATH")
-            llm = GPT4All(model=model_path)
-            
-            # Realiza a pesquisa
-            search_results = await aget_results(query)
-            
-            # Gera um resumo dos resultados encontrados
-            summary = create_summary(llm, search_results)
-            
-            # Atualiza a área de texto com os resultados
-            results_text.insert(tk.END, "Resultados da pesquisa:\n")
-            for i, result in enumerate(search_results):
-                results_text.insert(tk.END, f"{i+1}. {result['title']} - {result['href']}\n")
-            
-            results_text.insert(tk.END, "\nResumo das informações coletadas:\n")
-            results_text.insert(tk.END, summary)
-        except Exception as e:
-            messagebox.showerror("Erro", f"Ocorreu um erro ao realizar a pesquisa: {e}")
-        finally:
-            # Reabilita o botão após a pesquisa
-            search_button.config(state=tk.NORMAL)
-    
-    # Executa a função de pesquisa assíncrona
-    asyncio.run(run_search())
+    # Inicia a pesquisa em uma nova thread
+    threading.Thread(target=run_search, args=(query,), daemon=True).start()
 
 # Configurações da interface gráfica com tkinter
 app = tk.Tk()
