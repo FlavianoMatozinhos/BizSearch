@@ -12,9 +12,11 @@ import os
 # Carrega as variáveis de ambiente do arquivo .env
 load_dotenv()
 
+cache = {}
+
 async def aget_results(query):
     # Realiza a busca assíncrona usando DuckDuckGo
-    results = await AsyncDDGS(proxy=None).atext(query, max_results=5)
+    results = await AsyncDDGS(proxy=None).atext(query, max_results=1)  # Reduzido para 3 resultados
     return results
 
 def create_summary(llm, search_results):
@@ -35,15 +37,21 @@ def create_summary(llm, search_results):
 
 def run_search(query):
     try:
+        if query in cache:
+            summary = cache[query]
+            app.after(0, update_results, [], summary)  # Passa lista vazia para search_results
+            return
+
         # Configura o modelo GPT4All usando o caminho do .env
         model_path = os.getenv("GPT4ALL_MODEL_PATH")
         llm = GPT4All(model=model_path)
-        
+
         # Realiza a pesquisa
         search_results = asyncio.run(aget_results(query))
-        
+
         # Gera um resumo dos resultados encontrados
         summary = create_summary(llm, search_results)
+        cache[query] = summary  # Armazena no cache
 
         # Atualiza a área de texto com os resultados na thread principal
         app.after(0, update_results, search_results, summary)
